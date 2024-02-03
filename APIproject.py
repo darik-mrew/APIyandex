@@ -21,7 +21,7 @@ def load_map(mp):
     if not response:
         print("Ошибка выполнения запроса:")
         print(map_request)
-        print("Http статус:", response.status_code, "(", response.reason, ")")
+        print("HTTP статус:", response.status_code, "(", response.reason, ")")
         sys.exit(1)
 
     map_file = "map.png"
@@ -42,6 +42,31 @@ def main():
         event = pygame.event.wait()
         if event.type == pygame.QUIT:
             break
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_PAGEDOWN:
+                mp.zoom -= 1
+                if mp.zoom < 1:
+                    mp.zoom = 1
+            elif event.key == pygame.K_PAGEUP:
+                mp.zoom += 1
+                if mp.zoom > 19:
+                    mp.zoom = 19
+            elif event.key == pygame.K_UP:
+                mp.lt += 0.001
+                if mp.lt > 90:
+                    mp.lt = 90
+            elif event.key == pygame.K_DOWN:
+                mp.lt -= 0.001
+                if mp.lt < -90:
+                    mp.lt = -90
+            elif event.key == pygame.K_RIGHT:
+                mp.ln += 0.001
+                if mp.ln > 180:
+                    mp.ln = 180
+            elif event.key == pygame.K_LEFT:
+                mp.ln -= 0.001
+                if mp.ln < -180:
+                    mp.ln = -180
         map_file = load_map(mp)
         screen.blit(pygame.image.load(map_file), (0, 0))
         pygame.display.flip()
