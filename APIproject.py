@@ -89,7 +89,7 @@ class MapWindow(QMainWindow):
         self.load_map(self.mp)
 
     def initUI(self):
-        self.mp = {'lt': 59.939820, 'ln': 30.314383, 'zoom': 17, 'type': 'map'}
+        self.mp = {'lt': 59.939820, 'ln': 30.314383, 'z': 17, 'l': 'map'}
 
         self.enter_edit.setEnabled(False)
         self.find_button.setEnabled(False)
@@ -97,8 +97,8 @@ class MapWindow(QMainWindow):
     def load_map(self, mp):
         map_request_params = {
             'll': str(mp['ln']) + ',' + str(mp['lt']),
-            'z': str(mp['zoom']),
-            'l': mp['type']
+            'z': str(mp['z']),
+            'l': mp['l']
         }
         static_api = 'http://static-maps.yandex.ru/1.x/'
         response = requests.get(static_api, map_request_params)
@@ -106,22 +106,17 @@ class MapWindow(QMainWindow):
             print("Ошибка выполнения запроса")
             print("HTTP статус:", response.status_code, "(", response.reason, ")")
             sys.exit(1)
-
-        map_file = "map.png"
-        try:
-            with open(map_file, "wb") as file:
-                file.write(response.content)
-            pixmap = QPixmap(map_file)
+        else:
+            pixmap = QPixmap()
+            pixmap.loadFromData(response.content)
             self.image_label.setPixmap(pixmap)
-        except IOError as ex:
-            print("Ошибка записи временного файла:", ex)
-            sys.exit(2)
+
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key.Key_PageUp:
-            self.mp['zoom'] += (1 if self.mp['zoom'] < 19 else 0)
+            self.mp['z'] += (1 if self.mp['z'] < 19 else 0)
         if event.key() == QtCore.Qt.Key.Key_PageDown:
-            self.mp['zoom'] -= (1 if self.mp['zoom'] > 1 else 0)
+            self.mp['z'] -= (1 if self.mp['z'] > 1 else 0)
         if event.key() == QtCore.Qt.Key.Key_Up:
             self.mp['lt'] += (0.001 if self.mp['lt'] < 90 else 0)
         if event.key() == QtCore.Qt.Key.Key_Down:
@@ -130,9 +125,10 @@ class MapWindow(QMainWindow):
             self.mp['ln'] -= (0.001 if self.mp['ln'] > -180 else 0)
         if event.key() == QtCore.Qt.Key.Key_Right:
             self.mp['ln'] += (0.001 if self.mp['ln'] < 180 else 0)
+        if event.key() == QtCore.Qt.Key.Key_Space:
+            self.mp['l'] = ('skl' if self.mp['l'] == 'map' else 'map')
 
         self.load_map(self.mp)
-
         event.accept()
 
     def mousePressEvent(self, event):
@@ -143,9 +139,6 @@ class MapWindow(QMainWindow):
         else:
             self.enter_edit.setEnabled(False)
             self.find_button.setEnabled(False)
-
-    def closeEvent(self, event):
-        os.remove(self.map_file)
 
 
 if __name__ == "__main__":
