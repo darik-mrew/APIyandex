@@ -91,6 +91,8 @@ class MapWindow(QMainWindow):
     def initUI(self):
         self.mp = {'lt': 59.939820, 'ln': 30.314383, 'z': 17, 'l': 'map'}
 
+        self.find_button.clicked.connect(self.find_point)
+
         self.enter_edit.setEnabled(False)
         self.find_button.setEnabled(False)
 
@@ -100,6 +102,8 @@ class MapWindow(QMainWindow):
             'z': str(mp['z']),
             'l': mp['l']
         }
+        if 'pt' in mp:
+            map_request_params['pt'] = mp['pt']
         static_api = 'http://static-maps.yandex.ru/1.x/'
         response = requests.get(static_api, map_request_params)
         if not response:
@@ -111,6 +115,23 @@ class MapWindow(QMainWindow):
             pixmap.loadFromData(response.content)
             self.image_label.setPixmap(pixmap)
 
+    def find_point(self):
+        text = self.enter_edit.text()
+        search_api_server = "https://search-maps.yandex.ru/v1/"
+        search_params = {
+            'apikey': 'dda3ddba-c9ea-4ead-9010-f43fbc15c6e3',
+            'text': text,
+            'lang': 'ru_RU'
+        }
+
+        response = requests.get(search_api_server, params=search_params)
+        if response:
+            json = response.json()
+            pos = json['features'][0]['geometry']['coordinates']
+            self.mp['ln'] = pos[0]
+            self.mp['lt'] = pos[1]
+            self.mp['pt'] = f'{pos[0]},{pos[1]}'
+            self.load_map(self.mp)
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key.Key_PageUp:
