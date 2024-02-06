@@ -16,7 +16,7 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
     <x>0</x>
     <y>0</y>
     <width>580</width>
-    <height>460</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -57,7 +57,7 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
      <rect>
       <x>150</x>
       <y>350</y>
-      <width>171</width>
+      <width>321</width>
       <height>41</height>
      </rect>
     </property>
@@ -73,6 +73,32 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
     </property>
     <property name="text">
      <string>Сброс</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Полный адрес объекта:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="full_address_label">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>400</y>
+      <width>421</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>
@@ -118,6 +144,8 @@ class MapWindow(QMainWindow):
         }
         if 'pt' in mp and mp['pt'] != '':
             map_request_params['pt'] = mp['pt']
+        if 'full address' in mp:
+            self.full_address_label.setText(mp['full address'])
         static_api = 'http://static-maps.yandex.ru/1.x/'
         response = requests.get(static_api, map_request_params)
         if not response:
@@ -145,10 +173,12 @@ class MapWindow(QMainWindow):
             self.mp['ln'] = pos[0]
             self.mp['lt'] = pos[1]
             self.mp['pt'] = f'{pos[0]},{pos[1]}'
+            self.mp['full address'] = json['features'][0]['properties']['GeocoderMetaData']['text']
             self.load_map(self.mp)
 
     def reset_point(self):
         self.mp['pt'] = ''
+        self.mp['full address'] = ''
         self.load_map(self.mp)
 
     def keyPressEvent(self, event):

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>580</width>
-    <height>460</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -48,7 +48,7 @@
      <rect>
       <x>150</x>
       <y>350</y>
-      <width>171</width>
+      <width>321</width>
       <height>41</height>
      </rect>
     </property>
@@ -64,6 +64,32 @@
     </property>
     <property name="text">
      <string>Сброс</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Полный адрес объекта:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="full_address_label">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>400</y>
+      <width>421</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>
