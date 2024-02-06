@@ -62,6 +62,19 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="reset_button">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>350</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Сброс</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -92,6 +105,7 @@ class MapWindow(QMainWindow):
         self.mp = {'lt': 59.939820, 'ln': 30.314383, 'z': 17, 'l': 'map'}
 
         self.find_button.clicked.connect(self.find_point)
+        self.reset_button.clicked.connect(self.reset_point)
 
         self.enter_edit.setEnabled(False)
         self.find_button.setEnabled(False)
@@ -102,7 +116,7 @@ class MapWindow(QMainWindow):
             'z': str(mp['z']),
             'l': mp['l']
         }
-        if 'pt' in mp:
+        if 'pt' in mp and mp['pt'] != '':
             map_request_params['pt'] = mp['pt']
         static_api = 'http://static-maps.yandex.ru/1.x/'
         response = requests.get(static_api, map_request_params)
@@ -133,6 +147,10 @@ class MapWindow(QMainWindow):
             self.mp['pt'] = f'{pos[0]},{pos[1]}'
             self.load_map(self.mp)
 
+    def reset_point(self):
+        self.mp['pt'] = ''
+        self.load_map(self.mp)
+
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key.Key_PageUp:
             self.mp['z'] += (1 if self.mp['z'] < 19 else 0)
@@ -157,9 +175,11 @@ class MapWindow(QMainWindow):
                 self.enter_edit.y() <= event.pos().y() <= self.enter_edit.y() + self.enter_edit.height():
             self.enter_edit.setEnabled(True)
             self.find_button.setEnabled(True)
+            self.reset_button.setEnabled(True)
         else:
             self.enter_edit.setEnabled(False)
             self.find_button.setEnabled(False)
+            self.reset_button.setEnabled(False)
 
 
 if __name__ == "__main__":
